@@ -26,14 +26,14 @@ bibliography: bibliography.bib
 
 ```{r basic_setup, include=FALSE}
 # Set working directory
-setwd("~/Bayesian-causal-inference/Case_study_1")
+#setwd("~/Bayesian-causal-inference/Case_study_1")
 
 # Set RMarkdown options
 knitr::opts_chunk$set(echo = TRUE, warnings = FALSE, message = FALSE)
 
 # Set Stan options
 options(mc.cores = parallel::detectCores())
-rstan_options(auto_write = TRUE)
+#rstan_options(auto_write = TRUE)
 Sys.setenv(LOCAL_CPPFLAGS = '-march=native')
 
 # Call libraries
@@ -705,11 +705,11 @@ The **Stan** program for the Model 3 is fit to the example data:
 
 fit_mod3 <- stan(file = "Model_03_Independent_Potential_Outcomes_With_Covariates.stan",
                  data = stan_data,
-                 iter = 1000, chains = 1)
+                 iter = 1000, chains = 4)
 ```
 
 
-Next the posterior predictive distributions of the first 20 missng control potential outcomes are displayed. We see that the locations of the posterior predictive distributions vary in Model 3, whereas those of Model 1 are almost the same across the 20 missing potential outcomes. 
+Next the posterior predictive distributions of the first 20 missing control potential outcomes are displayed. We see that the locations of the posterior predictive distributions vary in Model 3, whereas those of Model 1 are almost the same across the 20 missing potential outcomes. 
 
 ```{r, fig.height=4, fig.width=8, eval=FALSE}
 # Model 1. Without Covariates
@@ -742,7 +742,15 @@ print(fit_mod3, pars = param,
 ```
 
 
-
+```{r, fig.height=5, fig.width=8}
+posterior <- as.array(fit_mod3)
+color_scheme_set("purple")
+mcmc_areas(posterior, pars = c("tau", "tau_fs", "tau_qte25", "tau_qte50", "tau_qte75"), 
+           prob = 0.8, prob_outer = 0.99, point_est = "mean" ) + 
+  vline_at(c(1.57), linetype = "dashed", color = "red", size = 1) + 
+  ggplot2::labs(title = "Model 3: Posterior distributions of the causal estimands", 
+                subtitle = "with means and 80% intervals")
+```
 
 
 # References
